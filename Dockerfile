@@ -1,33 +1,49 @@
+# Use an official Ubuntu as a parent image
+FROM ubuntu:20.04
 
-# Use the official Ubuntu LTS base image
-FROM ubuntu:latest
+# Set the maintainer label
+LABEL maintainer="tanay.nayak@gmail.com"
 
-# Set environment variables to reduce interaction needs
+# Set noninteractive mode for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update Ubuntu Software repository
-RUN apt-get update && apt-get install -y wget && apt-get clean
+# Update and install system-level dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    build-essential \
+    git \
+    curl \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# Download the Miniconda installation script
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh
+# Download and install Miniconda for ARM64
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
 
-# Install Miniconda
-RUN bash /miniconda.sh -b -p /opt/miniconda
+# Add Conda to PATH
+ENV PATH="/opt/conda/bin:${PATH}"
 
-# Remove the installer script
-RUN rm /miniconda.sh
+# Assuming the Dockerfile is at the same level as the dpok folder
 
-# Set path to conda
-ENV PATH=/opt/miniconda/bin:$PATH
+# Copy the environment file from the dpok folder
+COPY dpok/environment.yaml /tmp/environment.yml
 
-# Initialize conda for all shell types
-RUN conda init --all
+# Create the environment
+RUN conda env create -f /tmp/environment.yml
 
-# Optionally, update Conda
-RUN conda update -y conda
+# Activate the environment
+ENV PATH /opt/conda/envs/dpok/bin:$PATH
+ENV CONDA_DEFAULT_ENV dpok
 
-# Cleanup
-RUN conda clean -afy
+# Set the working directory
+WORKDIR /usr/src/app
 
-# Specify the command to run on container startup
-CMD [ "/bin/bash" ]
+# Copy the local code to the container
+COPY . .
+
+# Expose ports (if necessary)
+# EXPOSE 5000
+
+# Command to run when starting the container
+CMD ["/bin/bash"]
