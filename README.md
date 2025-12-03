@@ -15,6 +15,11 @@
 - [Contributors](#contributors)
 - [License](#license)
 
+## Conference Poster 
+
+<img width="2304" height="1728" alt="NLPSSM Conference Poster" src="https://github.com/user-attachments/assets/4e1658f1-6268-455b-8410-75ddf3b26920" />
+
+
 ## Introduction
 
 This project aims to bridge the gap between advancements in text-based model optimization and the domain of visual data, by applying the Direct Preference Optimization (DPO) framework to the ImageReward dataset. This novel application challenges the adaptability of text-oriented optimization methods to the complexities of visual data interpretation and sets the stage for a potential breakthrough in multimodal AI research.
